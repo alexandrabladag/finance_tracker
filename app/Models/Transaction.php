@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
 
 class Transaction extends Model
 {
@@ -36,4 +38,17 @@ class Transaction extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function scopeForMonth(Builder $query, Carbon $month): Builder
+    {
+        return $query->whereBetween(
+            'transaction_date',
+            [
+                $month->copy()->startOfMonth(),
+                $month->copy()->endOfMonth(),
+            ]
+        );
+    }
+
+
 }

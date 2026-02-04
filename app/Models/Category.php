@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Category extends Model
 {
@@ -39,4 +40,40 @@ class Category extends Model
     {
         return $this->hasMany(Budget::class);
     }
+
+    public function actualForMonth(Carbon $month): float
+    {
+        return (float) $this->transactions()
+            ->where('type', 'expense')
+            ->whereBetween(
+                'transaction_date',
+                [
+                    $month->copy()->startOfMonth(),
+                    $month->copy()->endOfMonth(),
+                ]
+            )
+            ->sum('amount');
+    }
+
+    public function budgetForMonth(Carbon $month): float
+    {
+        return (float) $this->budgets()
+            ->whereDate('period_start', $month->copy()->startOfMonth())
+            ->value('amount') ?? 0;
+    }
+
+    public function budgetSummaryForMonth(Carbon $month): array
+    {
+        $budget = $this->budgetForMonth($month);
+        $actual = $this->actualForMonth($month);
+
+        return [
+            'category' => $this->name,
+            'budget' => $budget,
+            'actual' => $actual,
+            'difference' => $budget - $actual,
+            'status' => $actual > $budget ? 'over' : 'within',
+        ];
+    }
+
 }

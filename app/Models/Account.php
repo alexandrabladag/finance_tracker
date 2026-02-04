@@ -28,4 +28,19 @@ class Account extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function balance(): float
+    {
+        $inflows = $this->transactions()
+            ->where('type', 'inflow')
+            ->sum('amount');
+
+        $expenses = $this->transactions()
+            ->where('type', 'expense')
+            ->sum('amount');
+
+        return (float) $this->opening_balance + $inflows - $expenses;
+    }
+
+
 }
