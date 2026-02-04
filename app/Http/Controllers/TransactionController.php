@@ -8,6 +8,32 @@ use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $month = Carbon::now();
+
+        $transactions = $user->transactions()
+            ->with(['account:id,name', 'category:id,name'])
+            ->forMonth($month)
+            ->orderByDesc('transaction_date')
+            ->get();
+
+        return inertia('Transactions/Index', [
+            'month' => $month->format('Y-m'),
+            'transactions' => $transactions->map(fn ($t) => [
+                'id' => $t->id,
+                'date' => $t->transaction_date->format('Y-m-d'),
+                'account' => $t->account->name,
+                'category' => $t->category->name,
+                'amount' => $t->amount,
+                'type' => $t->type,
+                'notes' => $t->notes,
+            ]),
+        ]);
+    }
+
     public function create(Request $request)
     {
         $user = $request->user();
