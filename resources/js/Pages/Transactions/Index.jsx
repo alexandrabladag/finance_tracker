@@ -3,6 +3,7 @@ export default function Index({ month, transactions }) {
         <div style={{ padding: '2rem' }}>
             <h1>Transactions</h1>
             <p>Month: {month}</p>
+            
 
             {transactions.length === 0 ? (
                 <p>No transactions found.</p>
@@ -25,6 +26,9 @@ export default function Index({ month, transactions }) {
                                 <td>{t.category}</td>
                                 <td>₱{t.amount}</td>
                                 <td>{t.notes}</td>
+                                <td>
+                                    <a href={route('transactions.edit', t.id)}>Edit</a>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
