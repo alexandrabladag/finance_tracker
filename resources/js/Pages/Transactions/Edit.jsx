@@ -1,13 +1,15 @@
 import { useForm } from '@inertiajs/react';
 
 export default function Edit({ transaction, accounts, categories }) {
-    const { data, setData, put, delete: destroy, processing, errors } = useForm({
+    const { data, setData, put, delete: destroy } = useForm({
         account_id: transaction.account_id,
         category_id: transaction.category_id,
+        type: transaction.type,
         amount: transaction.amount,
         transaction_date: transaction.transaction_date,
         notes: transaction.notes || '',
     });
+
 
     function submit(e) {
         e.preventDefault();
@@ -33,7 +35,13 @@ export default function Edit({ transaction, accounts, categories }) {
                         <option key={a.id} value={a.id}>{a.name}</option>
                     ))}
                 </select>
-
+                <select
+                    value={data.type}
+                    onChange={e => setData('type', e.target.value)}
+                >
+                    <option value="expense">Outflow</option>
+                    <option value="inflow">Inflow</option>
+                </select>
                 <select
                     value={data.category_id}
                     onChange={e => setData('category_id', e.target.value)}

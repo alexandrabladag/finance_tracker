@@ -4,6 +4,7 @@ export default function Create({ accounts, categories }) {
     const { data, setData, post, processing, errors } = useForm({
         account_id: '',
         category_id: '',
+        type: 'expense',
         amount: '',
         transaction_date: '',
         notes: '',
@@ -34,16 +35,30 @@ export default function Create({ accounts, categories }) {
                 </div>
 
                 <div>
+                    <label>Type</label>
+                    <select
+                        value={data.type}
+                        onChange={e => setData('type', e.target.value)}
+                    >
+                        <option value="expense">Outflow</option>
+                        <option value="inflow">Inflow</option>
+                    </select>
+                </div>
+
+                <div>
                     <label>Category</label>
                     <select
                         value={data.category_id}
                         onChange={e => setData('category_id', e.target.value)}
                     >
                         <option value="">Select</option>
-                        {categories.map(c => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
+                        {categories
+                            .filter(c => c.kind === data.type)
+                            .map(c => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
                     </select>
+
                     {errors.category_id && <div>{errors.category_id}</div>}
                 </div>
 
